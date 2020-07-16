@@ -23,6 +23,7 @@ class EarthquakesViewController: UIViewController {
     private let locationManager = CLLocationManager()
     
     private var isCurrentlyFetchingQuakes = false
+    private var shouldRequestQuakesAgain = false
     
     var quakes: [Quake] = [] {
         didSet {
@@ -57,12 +58,25 @@ class EarthquakesViewController: UIViewController {
     }
     
     func fetchQuakes() {
-        guard !isCurrentlyFetchingQuakes else { return }
+        // If we were already requesting quakes...
+        guard !isCurrentlyFetchingQuakes else {
+            // ... then we want to remember to refresh once the busy request comes back
+            shouldRequestQuakesAgain = true
+            return
+        }
+        
         isCurrentlyFetchingQuakes = true
         
         let visibleRegion = mapView.visibleMapRect
         quakeFetcher.fetchQuakes(in: visibleRegion) { (quakes, error) in
             self.isCurrentlyFetchingQuakes = false
+            
+            defer {
+                if self.shouldRequestQuakesAgain {
+                    self.shouldRequestQuakesAgain = false
+                    self.fetchQuakes()
+                }
+            }
             
             if let error = error {
                 NSLog("%@", "Error fetching quakes: \(error)")
