@@ -61,7 +61,16 @@ class EarthquakesViewController: UIViewController {
                 NSLog("%@", "Error fetching quakes: \(error)")
             }
             
-            self.quakes = quakes ?? []
+            guard let quakes = quakes else {
+                self.quakes = []
+                return
+            }
+            
+            let sortedQuakes = quakes.sorted { (a, b) -> Bool in
+                a.magnitude > b.magnitude
+            }
+            
+            self.quakes = Array(sortedQuakes.prefix(100))
         }
     }
     
@@ -80,6 +89,14 @@ extension EarthquakesViewController: MKMapViewDelegate {
         }
         
         annotationView.glyphImage = #imageLiteral(resourceName: "QuakeIcon")
+        
+        switch quake.magnitude {
+        case -10..<3: annotationView.markerTintColor = .systemYellow
+        case 3..<5: annotationView.markerTintColor = .systemOrange
+        case 5..<7: annotationView.markerTintColor = .systemRed
+        default: annotationView.markerTintColor = .systemPurple
+        }
+        
         annotationView.canShowCallout = true
         let detailView = QuakeDetailView()
         detailView.quake = quake
