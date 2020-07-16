@@ -98,8 +98,6 @@ class QuakeFetcher {
 				return
 			}
 			
-			print(data)
-			
 			do {
 				let decoder = JSONDecoder()
 				decoder.dateDecodingStrategy = .millisecondsSince1970
