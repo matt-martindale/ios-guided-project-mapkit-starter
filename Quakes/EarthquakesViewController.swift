@@ -46,3 +46,9 @@ class EarthquakesViewController: UIViewController {
     }
     
 }
+
+extension EarthquakesViewController: MKMapViewDelegate {
+    func mapViewDidChangeVisibleRegion(_ mapView: MKMapView) {
+        fetchQuakes()
+    }
+}
