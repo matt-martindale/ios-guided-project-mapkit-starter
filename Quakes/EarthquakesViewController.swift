@@ -22,6 +22,8 @@ class EarthquakesViewController: UIViewController {
     
     private let locationManager = CLLocationManager()
     
+    private var isCurrentlyFetchingQuakes = false
+    
     var quakes: [Quake] = [] {
         didSet {
             let oldQuakes = Set(oldValue)
@@ -55,8 +57,13 @@ class EarthquakesViewController: UIViewController {
     }
     
     func fetchQuakes() {
+        guard !isCurrentlyFetchingQuakes else { return }
+        isCurrentlyFetchingQuakes = true
+        
         let visibleRegion = mapView.visibleMapRect
         quakeFetcher.fetchQuakes(in: visibleRegion) { (quakes, error) in
+            self.isCurrentlyFetchingQuakes = false
+            
             if let error = error {
                 NSLog("%@", "Error fetching quakes: \(error)")
             }
